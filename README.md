@@ -69,17 +69,3 @@ Open your browser and navigate to **`http://localhost:5000`** to access the dash
 <img width="1169" height="1228" alt="image" src="https://github.com/user-attachments/assets/66a664db-e638-4336-96a7-ca8db23973c4" />
 
 ---
-
-## 📦 What Files Should I Upload to GitHub?
-
-### Files to Commit (Highly Recommended)
-- `frontend/` (contains `compare.html`, `styles.css`, `app.js`)
-- `compare_visulization.py`
-- `environment.yml` & `requirements.txt`
-- `setup_env.bat` & `run_server.bat`
-- `ENVIRONMENT_GUIDE.md` & `annotation_handbook.md`
-- `README.md` & `.gitignore`
-
-### Files to Keep Local (Optional/Ignored)
-- Large datasets or sensitive research annotations (e.g. `subset_40_stratified.jsonl`, `Arun-*.json`, `chenyi-*.json`).
-- If you decide to share your codebase cleanly, you can exclude these files via `.gitignore`. The dashboard's **"Upload Annotations"** tab allows any other user to upload their own annotation files directly from their browser, making the codebase highly portable and reusable for other research teams!
