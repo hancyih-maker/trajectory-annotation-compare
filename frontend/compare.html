@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trajectory Annotation Comparison</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="header glassmorphism">
+            <h1>Trajectory Annotation Comparison</h1>
+            <p class="subtitle">Visualizing and comparing Multi-agent LLM failure attribution between Arun & Chenyi</p>
+            
+            <div class="mode-selector-container" style="margin-top: 1.5rem; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                <div class="mode-tabs" style="display: flex; gap: 0.5rem; background: rgba(15, 23, 42, 0.04); padding: 0.25rem; border-radius: 0.5rem; border: 1px solid var(--border-color);">
+                    <button id="modePreloadedBtn" class="btn active-tab" style="border: none; padding: 0.5rem 1rem; border-radius: 0.35rem; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">Preloaded Files</button>
+                    <button id="modeUploadBtn" class="btn" style="border: none; padding: 0.5rem 1rem; border-radius: 0.35rem; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease;">Upload Annotations</button>
+                </div>
+                
+                <div id="activeServerStatus" class="status-indicator">
+                    <span class="pulse-dot"></span>
+                    <span id="statusText">Active Server Mode: Preloaded Datasets Loaded Successfully</span>
+                </div>
+            </div>
+            
+            <div id="uploadSection" class="upload-section hidden" style="margin-top: 1.5rem; justify-content: center; gap: 1.5rem; flex-wrap: wrap;">
+                <div class="upload-card">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 0.5rem; color: var(--accent-color);"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    <label for="file1">Upload Arun JSON</label>
+                    <input type="file" id="file1" accept=".json">
+                    <span class="file-name" id="fileName1">Choose file...</span>
+                </div>
+                <div class="upload-card">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 0.5rem; color: var(--accent-color);"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    <label for="file2">Upload Chenyi JSON</label>
+                    <input type="file" id="file2" accept=".json">
+                    <span class="file-name" id="fileName2">Choose file...</span>
+                </div>
+                <div style="width: 100%; display: flex; justify-content: center; margin-top: 0.5rem;">
+                    <button id="compareSubmitBtn" class="btn" style="background: var(--accent-color); color: white; border: none; padding: 0.6rem 1.5rem; border-radius: 0.5rem; font-weight: 600; cursor: not-allowed; opacity: 0.6;" disabled>Align & Compare Files</button>
+                </div>
+            </div>
+        </header>
+
+        <main id="mainContent">
+            <section class="stats-section glassmorphism">
+                <div class="stat-card">
+                    <h3>Overall Label Agreement Rate</h3>
+                    <div class="stat-value" id="overallAgreement">0%</div>
+                    <div class="stat-sub">Based on all aligned annotation steps</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Coordinator Thinking Agreement Rate</h3>
+                    <div class="stat-value" id="coordinatorAgreement">0%</div>
+                    <div class="stat-sub">Based on coordinator thinking rounds</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Expert Response Agreement Rate</h3>
+                    <div class="stat-value" id="expertAgreement">0%</div>
+                    <div class="stat-sub">Based on aligned expert reasoning cycles</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Final Answer Agreement Rate</h3>
+                    <div class="stat-value" id="finalAnswerAgreement">0%</div>
+                    <div class="stat-sub">Based on final answer decisions</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Comparable Trajectories</h3>
+                    <div class="stat-value" id="comparableCount">0</div>
+                    <div class="stat-sub" id="unannotatedCount">0 trajectories total</div>
+                </div>
+            </section>
+
+            <section class="results-section">
+                <div class="results-header">
+                    <h2>Trajectories Analysis</h2>
+                    <div class="filter-controls">
+                        <input type="text" id="searchInput" placeholder="Search by question or index...">
+                        <button id="filterDisagreementsBtn" class="btn">Show Only Disagreements</button>
+                    </div>
+                </div>
+                <div id="trajectoriesContainer" class="trajectories-container">
+                    <!-- Trajectories will be rendered here -->
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Template for a trajectory item -->
+    <template id="trajectoryTemplate">
+        <div class="trajectory-card glassmorphism">
+            <div class="trajectory-header">
+                <div class="traj-title">
+                    <span class="traj-id"></span>
+                    <h4 class="traj-question"></h4>
+                </div>
+                <div class="traj-stats">
+                    <span class="traj-agreement-badge badge-overall"></span>
+                    <button class="toggle-btn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="trajectory-content hidden">
+                <div class="steps-container"></div>
+            </div>
+        </div>
+    </template>
+
+    <script src="app.js"></script>
+</body>
+</html>
