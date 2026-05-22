@@ -66,6 +66,8 @@ conda run -n compare_env --no-capture-output python compare_visulization.py
 
 Open your browser and navigate to **`http://localhost:5000`** to access the dashboard.
 
+<img width="1169" height="1228" alt="image" src="https://github.com/user-attachments/assets/66a664db-e638-4336-96a7-ca8db23973c4" />
+
 ---
 
 ## 📦 What Files Should I Upload to GitHub?
